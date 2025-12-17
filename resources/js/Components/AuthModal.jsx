@@ -61,7 +61,7 @@ export default function AuthModal({ show, onClose, initialMode = 'login' }) {
                         </button>
 
                         <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                            {mode === 'login' ? 'Welcome Back' : 'Join Quest Chronicle'}
+                            {mode === 'login' ? 'Welcome Back' : 'Join GameVoyage'}
                         </h2>
                         <p className="text-gray-400 text-sm mb-6">
                             {mode === 'login' 
