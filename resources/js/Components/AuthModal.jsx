@@ -60,7 +60,7 @@ export default function AuthModal({ show, onClose, initialMode = 'login' }) {
                             <X className="w-5 h-5" />
                         </button>
 
-                        <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                        <h2 className="text-3xl font-bold bg-gradient-to-r from-violet-500 to-green-500 bg-clip-text text-transparent mb-2">
                             {mode === 'login' ? 'Welcome Back' : 'Join GameVoyage'}
                         </h2>
                         <p className="text-gray-400 text-sm mb-6">
@@ -80,7 +80,7 @@ export default function AuthModal({ show, onClose, initialMode = 'login' }) {
                                         type="text"
                                         value={data.name}
                                         onChange={(e) => setData('name', e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
                                         placeholder="Your name"
                                         required
                                     />
@@ -97,7 +97,7 @@ export default function AuthModal({ show, onClose, initialMode = 'login' }) {
                                     type="email"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
                                     placeholder="your@email.com"
                                     required
                                 />
@@ -113,7 +113,7 @@ export default function AuthModal({ show, onClose, initialMode = 'login' }) {
                                     type="password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -130,7 +130,7 @@ export default function AuthModal({ show, onClose, initialMode = 'login' }) {
                                         type="password"
                                         value={data.password_confirmation}
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
                                         placeholder="••••••••"
                                         required
                                     />
@@ -141,7 +141,7 @@ export default function AuthModal({ show, onClose, initialMode = 'login' }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl font-medium transition-all disabled:opacity-50 shadow-lg shadow-pink-500/30 flex items-center justify-center gap-2"
+                            className="w-full py-4 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 rounded-xl font-medium transition-all disabled:opacity-50 shadow-lg shadow-violet-500/30 flex items-center justify-center gap-2"
                         >
                             {processing ? (
                                 <>
@@ -156,7 +156,7 @@ export default function AuthModal({ show, onClose, initialMode = 'login' }) {
                         <button
                             type="button"
                             onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-                            className="w-full text-sm text-gray-400 hover:text-pink-400 transition-colors mt-4"
+                            className="w-full text-sm text-gray-400 hover:text-violet-400 transition-colors mt-4"
                         >
                             {mode === 'login' 
                                 ? "Don't have an account? Sign up"

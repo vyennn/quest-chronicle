@@ -259,8 +259,8 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                 opacity: 1;
                             }
                             70% {
-                                transform: scale(6);
-                                opacity: 4;
+                                transform: scale(7);
+                                opacity: 1;
                             }
                             100% { 
                                 transform: scale(10); 
@@ -760,7 +760,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         className={`px-6 py-3 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                                             filterGenre === genre
                                                 ? 'bg-gradient-to-r from-green-500 to-green-500 shadow-lg shadow-violet-500/30'
-                                                : 'bg-violet-400 hover:bg-violet-400 border border-white/10'
+                                                : 'text-white bg-gray-400 hover:bg-gray-500 border border-white/10'
                                         }`}
                                     >
                                         {genre === 'all' ? 'All Genres' : genre}
@@ -803,7 +803,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                         e.stopPropagation();
                                                         toggleFavorite(game);
                                                     }}
-                                                    className="absolute top-4 right-4 p-3 bg-black/50 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-black/70 transition-all border border-gray-200 dark:border-white/20"
+                                                    className="absolute top-4 right-4 p-3 bg-black/50 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-black/100 dark:hover:bg-black/70 transition-all border border-gray-200 dark:border-white/20"
                                                 >
                                                     <Heart className={`w-5 h-5 ${favorites.includes(game.id) ? 'fill-violet-500 text-violet-500' : 'text-white'}`} />
                                                 </motion.button>
@@ -876,7 +876,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.9 }}
                                                     onClick={() => startEditNote(game.id)}
-                                                    className="text-gray-400 hover:text-pink-400 transition-colors"
+                                                    className="text-gray-400 hover:text-violet-400 transition-colors"
                                                 >
                                                     <Edit2 className="w-4 h-4" />
                                                 </motion.button>
@@ -999,7 +999,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                 }}
                                                 className="p-4 bg-black/50 backdrop-blur-sm rounded-full hover:bg-black/70 transition-all border border-white/20"
                                             >
-                                                <Heart className={`w-7 h-7 ${favorites.includes(selectedGame.id) ? 'fill-pink-500 text-pink-500' : ''}`} />
+                                                <Heart className={`w-7 h-7 ${favorites.includes(selectedGame.id) ? 'fill-violet-500 text-violet-500' : ''}`} />
                                             </motion.button>
                                         </motion.div>
                                     </div>
@@ -1071,8 +1071,8 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                             className="text-center"
                         >
                             <div className="flex items-center justify-center gap-3 mb-4">
-                                <Gamepad2 className="w-6 h-6 text-pink-500" />
-                                <span className="text-xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+
+                                <span className="text-xl font-bold bg-gradient-to-r from-violet-500 to-green-500 bg-clip-text text-transparent">
                                     GameVoyage
                                 </span>
                             </div>

@@ -167,11 +167,8 @@ export default function GameVoyageIntro({ onComplete }) {
                 className="relative"
               >
                 <motion.span
-                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-green-500 via-violet-500 to-violet-500 bg-clip-text text-transparent"
-                  style={{
-                    textShadow: '0 0 30px rgba(236,72,153,0.5)',
-                    filter: 'drop-shadow(0 0 10px rgba(236,72,153,0.3))'
-                  }}
+                  className="text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-500 via-green-500 to-violet-500 drop-shadow-[0_5px_2px_rgba(0,0,0,0.5)]"
+                  
                 >
                   {letter}
                 </motion.span>
@@ -184,7 +181,7 @@ export default function GameVoyageIntro({ onComplete }) {
                     transition={{ duration: 0.5 }}
                     className="absolute inset-0 flex items-center justify-center"
                   >
-                    <div className="w-16 h-16 border-4 border-pink-500 rounded-full" />
+                    <div className="w-16 h-16 border-4 border-violet-500 rounded-full" />
                   </motion.div>
                 )}
               </motion.div>
@@ -218,7 +215,7 @@ export default function GameVoyageIntro({ onComplete }) {
             {[...Array(3)].map((_, i) => (
               <motion.div
                 key={i}
-                className="w-3 h-3 bg-pink-400 rounded-full"
+                className="w-3 h-3 bg-violet-400 rounded-full"
                 animate={{
                   scale: [1, 1.5, 1],
                   opacity: [0.5, 1, 0.5]
