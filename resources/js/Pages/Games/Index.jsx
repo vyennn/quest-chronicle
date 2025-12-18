@@ -1,29 +1,55 @@
+
 import React, { useState, useEffect, useRef, useCallback} from 'react';
 import { Head, router } from '@inertiajs/react';
 import { Search, Gamepad2, Heart, BookOpen, Sparkles, X, Plus, Edit2, Trash2, User, LogOut, ChevronDown, Menu, Filter, Star, TrendingUp, Clock } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import AuthModal from '@/Components/AuthModal';
 import GameVoyageIntro from '@/Components/GameVoyageIntro';
-import '@google/model-viewer';
+import '@google/model-viewer'; 
+import ThemeToggle from '@/Components/ThemeToggle';
 
 export default function Index({ games, userFavorites, userNotes, auth }) {
-    // Add this check
     if (!games || games.length === 0) {
         return (
             <div className="min-h-screen bg-black text-white flex items-center justify-center">
                 <div className="text-center">
-                    <Gamepad2 className="w-20 h-20 text-pink-500 mx-auto mb-4 animate-spin" />
+                    <Gamepad2 className="w-20 h-20 text-violet-500 mx-auto mb-4 animate-spin" />
                     <p className="text-xl text-gray-400">Loading games...</p>
                 </div>
             </div>
         );
     }
-    const [showLaptopIntro, setShowLaptopIntro] = useState(true);
+    
+    const [showPlanetIntro, setShowPlanetIntro] = useState(true);
+    const [showGameVoyageIntro, setShowGameVoyageIntro] = useState(false);
     const [introComplete, setIntroComplete] = useState(false);
-    const handleIntroComplete = useCallback(() => {
-        setIntroComplete(true);
+    
+    useEffect(() => {
+        // Planet shows for 3 seconds then fades out
+        const planetTimer = setTimeout(() => {
+            setShowPlanetIntro(false);
+            setShowGameVoyageIntro(true);
+        }, 3000);
+
+        return () => {
+            clearTimeout(planetTimer);
+        };
     }, []);
     
+    const handleGameVoyageIntroComplete = useCallback(() => {
+        setShowGameVoyageIntro(false);
+        setIntroComplete(true);
+    }, []);
+
+    const [isDark, setIsDark] = useState(false);
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            setIsDark(true);
+            document.documentElement.classList.add('dark');
+        }
+    }, []);
     const [selectedGame, setSelectedGame] = useState(null);
     const [favorites, setFavorites] = useState(userFavorites || []);
     const [notes, setNotes] = useState(userNotes || {});
@@ -37,13 +63,15 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
     const containerRef = useRef(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMode, setAuthMode] = useState('login');
-
+    const [activeSection, setActiveSection] = useState('explore');
     const { scrollYProgress } = useScroll();
     const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
     const heroOpacity = useTransform(smoothProgress, [0, 0.3], [1, 0]);
     const heroScale = useTransform(smoothProgress, [0, 0.3], [1, 0.95]);
     const heroY = useTransform(smoothProgress, [0, 0.3], [0, -100]);
-
+    const scrollToGames = () => {
+        document.getElementById('games-section').scrollIntoView({ behavior: 'smooth' });
+    };
     useEffect(() => {
         const handleMouseMove = (e) => {
             setMousePosition({ x: e.clientX, y: e.clientY });
@@ -52,12 +80,31 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
-    // Add this new useEffect
     useEffect(() => {
         setFavorites(userFavorites || []);
         setNotes(userNotes || {});
     }, [userFavorites, userNotes]);
-
+    useEffect(() => {
+        const handleScroll = () => {
+            const heroSection = document.querySelector('section');
+            const gamesSection = document.getElementById('games-section');
+            
+            if (gamesSection && window.scrollY >= gamesSection.offsetTop - 100) {
+                // Only change to 'games' if we're actually viewing favorites
+                if (showFavorites) {
+                    setActiveSection('games');
+                } else {
+                    setActiveSection('games');
+                }
+            } else if (heroSection && !showFavorites) {
+                // Only go back to 'explore' if we're NOT in favorites mode
+                setActiveSection('explore');
+            }
+        };
+        
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [showFavorites]);
     const genres = ['all', ...new Set(games.map(g => g.genre))];
 
     const filteredGames = games.filter(game => {
@@ -182,48 +229,50 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
         });
     };
 
-    const scrollToGames = () => {
-        document.getElementById('games-section').scrollIntoView({ behavior: 'smooth' });
-    };
 
     return (
         <>
             <Head title="GameVoyage" />
-           {showLaptop && (
-    <div
-        className="fixed inset-0 z-[200] bg-white flex items-center justify-center overflow-hidden"
-        style={{
-            animation: 'laptopFadeOut 1s ease-in-out 3s forwards',
-        }}
-    >
-        <style>{`
-            @keyframes laptopZoom {
-                0% { transform: scale(1); opacity: 1; }
-                100% { transform: scale(3); opacity: 0; }
-            }
-            @keyframes laptopFadeOut {
-                0% { opacity: 1; }
-                100% { opacity: 0; pointer-events: none; }
-            }
-        `}</style>
+            
+            {/* Planet Intro Animation - Shows First */}
+            {showPlanetIntro && (
+                <div className="fixed inset-0 z-[200] bg-white flex items-center justify-center overflow-hidden">
+                    <style>{`
+                        @keyframes planetZoomFade {
+                            0% { 
+                                transform: scale(0.5); 
+                                opacity: 0; 
+                            }
+                            20% {
+                                transform: scale(1);
+                                opacity: 1;
+                            }
+                            70% {
+                                transform: scale(6);
+                                opacity: 4;
+                            }
+                            100% { 
+                                transform: scale(10); 
+                                opacity: 0; 
+                            }
+                        }
+                    `}</style>
+                    
+                    <img 
+                        src="/Model/planet01.png"
+                        alt="Planet"
+                        className="w-96 h-96 object-contain"
+                        style={{ 
+                            animation: 'planetZoomFade 3s ease-in-out forwards' 
+                        }}
+                    />
+                </div>
+            )}
 
-        <div style={{ animation: 'laptopZoom 1s ease-in-out 3s forwards' }}>
-            <model-viewer
-                src="/Model/laptop.glb"
-                alt="Laptop Intro"
-                auto-rotate
-                camera-controls={false}
-                interaction-prompt="none"
-                style={{ width: '600px', height: '400px' }}
-            />
-        </div>
-    </div>
-)}
-
-{!showLaptop && !introComplete && (
-    <GameVoyageIntro onComplete={() => setIntroComplete(true)} />
-)}
-
+            {/* GameVoyage Intro - Shows Second */}
+            {showGameVoyageIntro && (
+                <GameVoyageIntro onComplete={handleGameVoyageIntroComplete} />
+            )}
 
              {/* Your existing dashboard - wrapped in fade-in animation */}
             {introComplete && (
@@ -232,21 +281,47 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1 }}
                 >
-            <div className="min-h-screen bg-[#fffff] text-white overflow-x-hidden">
-
-                {/* Cursor Follower */}
-                <motion.div
-                    className="fixed w-6 h-6 border-2 border-violet-500 rounded-full pointer-events-none z-50 mix-blend-difference hidden lg:block"
-                    animate={{
-                        x: mousePosition.x - 12,
-                        y: mousePosition.y - 12,
-                    }}
-                    transition={{ 
-                        type: "tween",
-                        duration: 0.1,
-                        ease: "linear"
-                    }}
-                />
+            <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white overflow-x-hidden transition-colors duration-300">
+            <motion.div 
+                            className="fixed inset-0 pointer-events-none z-0"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 1.5, delay: 0.5 }}
+                        >
+                            {[...Array(30)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    className="absolute w-2 h-2 bg-violet-400 rounded-full"
+                                    initial={{
+                                        x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1920),
+                                        y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1080),
+                                        opacity: 0
+                                    }}
+                                    animate={{
+                                        y: [
+                                            null,
+                                            Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1080)
+                                        ],
+                                        opacity: [0.2, 0.6, 0.2]
+                                    }}
+                                    transition={{
+                                        duration: Math.random() * 4 + 3,
+                                        repeat: Infinity,
+                                        ease: "linear",
+                                        delay: Math.random() * 2
+                                    }}
+                                />
+                            ))}
+                        </motion.div>
+{/* Cursor Follower */}
+<div
+                            className="fixed w-6 h-6 border-2 border-violet-500 dark:border-violet-500 rounded-full pointer-events-none z-50 mix-blend-difference hidden lg:block"
+                            style={{
+                                left: `${mousePosition.x - 12}px`,
+                                top: `${mousePosition.y - 12}px`,
+                                transition: 'none'
+                            }}
+                        />
 
                 {/* Animated Background Gradient */}
                 <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -259,7 +334,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                         }}
                         transition={{ type: "spring", damping: 50 }}
                     />
-                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-pink-500/10 rounded-full blur-3xl animate-pulse" />
+                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-3xl animate-pulse" />
                     <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
                     <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
                 </div>
@@ -271,10 +346,11 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                     className="fixed top-0 left-0 right-0 z-40"
                 >
                     <div className="container mx-auto px-4 lg:px-8">
-                        <div className="flex items-center justify-between h-20">
+                        <div className="grid grid-cols-[auto_1fr_auto_auto] items-center h-20">
+
                             {/* Logo - Floating Pill */}
                             <motion.div 
-                                className="flex items-center gap-3 cursor-pointer bg-white/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/10"
+                                className="flex items-center gap-3 cursor-pointer bg-white/90 dark:bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-gray-200 dark:border-white/10"
                                 whileHover={{ scale: 1.05 }}
                                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             >
@@ -282,10 +358,6 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                                 >
-                                
-
-
-
                                 </motion.div>
                                 <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-500 via-green-500 to-green-500 bg-clip-text text-transparent">
                                     GameVoyage
@@ -293,38 +365,54 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                             </motion.div>
 
                             {/* Desktop Menu - Floating Pill */}
-                            <nav className="hidden lg:flex gap-3 absolute left-[70%] transform -translate-x-1/2 bg-white backdrop-blur-md px-6 py-3 rounded-full border border-white/10">
-                                <button
-                                    onClick={() => {
-                                        setShowFavorites(false);
-                                        document.getElementById('games-section').scrollIntoView({ behavior: 'smooth' });
-                                    }}
-                                    className="font-bold px-4 py-2 text-l text-violet-400 hover:text-white hover:bg-white/10 rounded-full transition-all"
-                                >
-                                    Explore
-                                </button>
-                                <button
-                                    onClick={() => setShowFavorites(!showFavorites)}
-                                    className={`px-4 py-2 text-l transition-all flex gap-2 rounded-full ${
-                                        showFavorites 
-                                            ? 'text-pink-400 bg-pink-500/20' 
-                                            : 'font-bold text-violet-400 hover:text-white hover:bg-white/10'
-                                    }`}
-                                >
-                                    <Heart className={`w-4 h-4 ${showFavorites ? 'fill-pink-400 text-pink-400' : ''}`} />
-                                    Collection ({favorites.length})
-                                </button>
-                            </nav>
+                            <nav className="hidden lg:flex justify-center">
+    <div className="flex gap-3 bg-white/90 dark:bg-black/30 backdrop-blur-md
+                    px-2 py-2 rounded-full border border-gray-200 dark:border-white/10">
+        {/* Explore */}
+        <button
+    onClick={() => {
+        setActiveSection('explore');   // 👈 ADD THIS
+        setShowFavorites(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }}
+    className={`font-bold px-4 py-2 rounded-full transition-all ${
+        activeSection === 'explore'
+            ? 'bg-violet-500 text-white'
+            : 'text-violet-600 dark:text-violet-400 hover:bg-violet-300 dark:hover:bg-white/10'
+    }`}
+>
+    Explore
+</button>
+
+
+        {/* Collection */}
+<button 
+    onClick={() => {
+        setShowFavorites(true);
+        setActiveSection('games');
+        scrollToGames();
+    }}
+    className={`font-bold px-4 py-2 rounded-full transition-all ${
+        activeSection === 'games'
+            ? 'bg-violet-500 text-white'
+            : 'text-violet-600 dark:text-violet-400 hover:bg-violet-300 dark:hover:bg-white/10'
+    }`}>
+    Collection ({favorites.length})
+</button>
+    </div>
+</nav>
+
 
                             {/* Auth Buttons - Floating Pill */}
                             <div className="flex items-center gap-4">
+                            <ThemeToggle />
                                 {auth?.user ? (
                                     <div className="relative">
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => setShowUserMenu(!showUserMenu)}
-                                            className="flex items-center gap-2 px-4 py-2 bg-black/30 backdrop-blur-md hover:bg-black/50 rounded-full transition-all border border-white/10"
+                                            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-black/30 backdrop-blur-md hover:bg-gray-200 dark:hover:bg-black/50 rounded-full transition-all border border-gray-200 dark:border-white/10"
                                         >
                                             <User className="w-4 h-4" />
                                             <span className="hidden md:inline text-sm">{auth.user.name}</span>
@@ -336,11 +424,11 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                     initial={{ opacity: 0, y: -10 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: -10 }}
-                                                    className="absolute right-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+                                                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900/95 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl"
                                                 >
                                                     <button
                                                         onClick={handleLogout}
-                                                        className="w-full px-4 py-3 flex items-center gap-2 hover:bg-white/5 transition-all text-left text-sm"
+                                                        className="w-full px-4 py-3 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-left text-sm text-gray-900 dark:text-white"
                                                     >
                                                         <LogOut className="w-4 h-4" />
                                                         Logout
@@ -350,7 +438,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         </AnimatePresence>
                                     </div>
                                 ) : (
-                                    <div className="flex gap-2 bg-violet-100 backdrop-blur-md px-0 py-0 rounded-full border border-white/10">
+                                    <div className="flex gap-2 bg-gray-100 dark:bg-violet-100/10 backdrop-blur-md px-2 py-2 rounded-full border border-gray-200 dark:border-white/10">
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
@@ -358,7 +446,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                 setAuthMode('login');
                                                 setShowAuthModal(true);
                                             }}
-                                            className=" font-bold px-4 py-2 text-l text-violet-500 hover:bg-white/10 rounded-full transition-all"
+                                            className="font-bold px-4 py-2 text-l text-violet-600 dark:text-violet-400 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full transition-all"
                                         >
                                             Login
                                         </motion.button>
@@ -390,10 +478,10 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2 }}
-                                className="inline-flex items-center gap-2 mb-1 px-1 bg-white/5 backdrop-blur-sm rounded-full border border-white/10"
+                                className="inline-flex items-center gap-2 mb-1 px-4 py-2 bg-violet-100 dark:bg-white/5 backdrop-blur-sm rounded-full border border-gray-200 dark:border-white/10"
                             >
                                 <Sparkles className="w-5 h-5 text-violet-400" />
-                                <span className="text-violet-400 text-sm font-medium tracking-widest uppercase">
+                                <span className="text-violet-600 dark:text-violet-400 text-sm font-medium tracking-widest uppercase">
                                     Your Free Gaming Universe Awaits
                                 </span>
                             </motion.div>
@@ -428,7 +516,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.8, delay: 0.7 }}
-                                className="text-lg md:text-xl lg:text-2xl text-gray-400 font-light"
+                                className="text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-400 font-light"
                             >
                                 Discover, explore, and chart your adventure across thousands of free-to-play games.
                             </motion.p>
@@ -485,8 +573,8 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                     delay: 1.5 
                                 }
                             }}
-                            className="w-full max-w-md lg:w-[1000px] h-[800px] lg:h-[800px]"
-                        >
+                            className="w-full max-w-md lg:w-[800px] h-[1000px] lg:h-[800px]
+                            dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.35)]">
                             <model-viewer
                                 src="Model/arcade-machine.glb"
                                 alt="3D Arcade Machine"
@@ -512,30 +600,32 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                     </div>
 
                     {/* Scroll Indicator */}
-                    <motion.div
-                        initial={{ opacity: 0 }}    
-                        animate={{ opacity: 1, y: [0, 10, 0] }}
-                        transition={{ 
-                            opacity: { delay: 1.2, duration: 0.5 }, 
-                            y: { duration: 2, repeat: Infinity, delay: 1.5 } 
-                        }}
-                        className="absolute bottom-20 left-1/2 transform -translate-x-[10px] cursor-pointer" 
-                        onClick={scrollToGames}
-                    >
-                        <ChevronDown className="w-8 h-8 text-gray-500" />
-                    </motion.div>
+                    {/* Scroll Indicator */}
+<motion.div
+    initial={{ opacity: 0 }}    
+    animate={{ opacity: 1, y: [0, 10, 0] }}
+    transition={{ 
+        opacity: { delay: 1.2, duration: 0.5 }, 
+        y: { duration: 2, repeat: Infinity, delay: 1.5 } 
+    }}
+    className="absolute bottom-20 left-1/2 transform -translate-x-[10px] cursor-pointer" 
+    onClick={scrollToGames}
+>
+    <ChevronDown className="w-8 h-8 text-gray-500" />
+</motion.div>
                 </motion.section>
                         {/* 3D Model Section */}
                         <motion.section
     initial={{ opacity: 0, y: 50 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 1 }}
-    className="relative flex flex-col lg:flex-row items-center justify-center my-0 gap-11"
+    className="relative flex flex-col lg:flex-row items-center justify-center my-0 gap-8"
 >
     {/* First Model */}
-    <div className="w-full max-w-sm h-[400px] lg:h-[500px]">
+    <div className="w-full max-w-sm h-[400px] lg:h-[500px]
+                dark:drop-shadow-[0_0_35px_rgba(255,255,255,0.35)]">
     <model-viewer
-    src="/Model/character-employee.glb"
+    src="/Model/character-female-a.glb"
     alt="Character Employee"
     auto-rotate            // spins automatically
     disable-zoom           // disables zoom
@@ -548,19 +638,34 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
     </div>
 
     {/* Second Model */}
-    <div className="w-full max-w-sm h-[400px] lg:h-[500px]">
+    <div className="w-full max-w-sm h-[400px] lg:h-[500px]
+                dark:drop-shadow-[0_0_35px_rgba(255,255,255,0.35)]">
     <model-viewer
-    src="/Model/character-gamer.glb"
+    src="/Model/character-m.glb"
     alt="Character Gamer"
     auto-rotate
     disable-zoom
     interaction-prompt="none"
     shadow-intensity="1"    
     camera-controls={false}
-    style={{ width: '100%', height: '100%', '--poster-color': 'transparent' }}
+    style={{ width: '100%', height: '90%', '--poster-color': 'transparent' }}
 />
 
     </div>
+     {/* Model 3 (NEW) */}
+     <div className="w-full max-w-sm h-[400px] lg:h-[500px]
+                dark:drop-shadow-[0_0_35px_rgba(255,255,255,0.35)]">
+    <model-viewer
+      src="/Model/character-soldier.glb"   // 🔁 replace with your actual model
+      alt="Character Explorer"
+      auto-rotate
+      disable-zoom
+      interaction-prompt="none"
+      shadow-intensity="1"
+      camera-controls={false}
+      style={{ width: '100%', height: '100%', '--poster-color': 'transparent' }}
+    />
+  </div>
 </motion.section>
 
 
@@ -581,7 +686,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                             }}
                             className="text-center mb-8"
                         >
-                            <h2 className="text-5xl md:text-7xl font-bold mb-3 bg-gradient-to-r from-violet-500 to-green-500 bg-clip-text text-transparent">
+                            <h2 className="text-5xl md:text-7xl font-bold mb-3 bg-gradient-to-r from-violet-700 to-green-700 bg-clip-text text-transparent">
                                 Explore Games
                             </h2>
                             
@@ -590,7 +695,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                 whileInView={{ opacity: 1 }}
                                 viewport={{ once: false, amount: 0.5 }}
                                 transition={{ delay: 0.3, duration: 0.8 }}
-                                className="text-xl text-gray-400 max-w-2xl mx-auto"
+                                className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
                             >
                                 Dive into a curated collection of free-to-play experiences
                             </motion.p>
@@ -605,13 +710,13 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                         >
                             <div className="flex flex-col lg:flex-row gap-4">
                                 <div className="relative flex-1">
-                                    <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-violet-500 w-5 h-5" />
+                                    <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-grey-500 w-5 h-5" />
                                     <input
                                         type="text"
                                         placeholder="Search your next adventure..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-14 pr-6 py-5 bg-white/5 backdrop-blur-xl border border-violet-400 rounded-2xl text-white placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all text-lg"
+                                        className="w-full pl-14 pr-6 py-5 bg-white dark:bg-white/5 backdrop-blur-xl border border-violet-400 dark:border-violet-400 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all text-lg"
                                     />
                                 </div>
                                 <motion.button
@@ -620,8 +725,8 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                     onClick={() => setShowFavorites(!showFavorites)}
                                     className={`px-8 py-5 rounded-2xl font-medium transition-all flex items-center justify-center gap-3 text-lg ${
                                         showFavorites
-                                            ? 'bg-gradient-to-r from-violet-500 to-violet-500'
-                                            : 'bg-violet-500 hover:bg-violet-500 border border-violet-500'
+                                            ? 'bg-gradient-to-r from-violet-500 to-violet-500 text-white'
+                                            : 'bg-violet-500 dark:bg-violet-500/10 hover:bg-violet-600 dark:hover:bg-violet-500/20 border border-gray-200 dark:border-violet-500 text-white dark:text-white'
                                     }`}
                                 >
                                     <Heart className={`w-6 h-6 ${showFavorites ? 'fill-current' : ''}`} />
@@ -643,7 +748,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         onClick={() => setFilterGenre(genre)}
                                         className={`px-6 py-3 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                                             filterGenre === genre
-                                                ? 'bg-gradient-to-r from-violet-500 to-green-500 shadow-lg shadow-violet-500/30'
+                                                ? 'bg-gradient-to-r from-green-500 to-green-500 shadow-lg shadow-violet-500/30'
                                                 : 'bg-violet-400 hover:bg-violet-400 border border-white/10'
                                         }`}
                                     >
@@ -666,7 +771,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                             exit={{ opacity: 0, scale: 0.9 }}
                                             transition={{ delay: index * 0.05 }}
                                             whileHover={{ y: -10 }}
-                                            className="group relative bg-violet-100 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/10 hover:border-pink-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/20"
+                                            className="group relative bg-white dark:bg-violet-100/5 backdrop-blur-xl rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 hover:border-violet-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-violet-500/20"
                                         >
                                             {/* Game Image */}
                                             <div className="relative h-56 overflow-hidden">
@@ -687,9 +792,9 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                         e.stopPropagation();
                                                         toggleFavorite(game);
                                                     }}
-                                                    className="absolute top-4 right-4 p-3 bg-black/50 backdrop-blur-sm rounded-full hover:bg-black/70 transition-all border border-white/20"
+                                                    className="absolute top-4 right-4 p-3 bg-black/50 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-black/70 transition-all border border-gray-200 dark:border-white/20"
                                                 >
-                                                    <Heart className={`w-5 h-5 ${favorites.includes(game.id) ? 'fill-pink-500 text-pink-500' : 'text-white'}`} />
+                                                    <Heart className={`w-5 h-5 ${favorites.includes(game.id) ? 'fill-violet-500 text-violet-500' : 'text-white'}`} />
                                                 </motion.button>
 
                                                 {/* Genre Badge */}
@@ -700,14 +805,14 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
 
                                             {/* Game Info */}
                                             <div className="p-6 space-y-4">
-                                                <h3 className="text-gray-500 text-2xl font-bold line-clamp-1 group-hover:text-violet-500 transition-colors">
+                                                <h3 className="text-gray-900 dark:text-gray-100 text-2xl font-bold line-clamp-1 group-hover:text-violet-500 transition-colors">
                                                     {game.title}
                                                 </h3>
-                                                <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed">
+                                                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 leading-relaxed">
                                                     {game.short_description}
                                                 </p>
 
-                                                <div className="flex items-center justify-between text-xs text-gray-500">
+                                                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
                                                     <span className="flex items-center gap-2">
                                                         <Gamepad2 className="w-4 h-4" />
                                                         {game.platform}
@@ -728,7 +833,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                             value={noteText}
                                             onChange={(e) => setNoteText(e.target.value)}
                                             placeholder="Add your personal note..."
-                                            className="w-full p-4 bg-white/5 border border-white/20 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                                            className="w-full p-4 bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/20 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
                                             rows="3"
                                             autoFocus
                                         />
@@ -752,7 +857,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         </div>
                                     </div>
                                 ) : notes[game.id] ? (
-                                    <div className="bg-white/5 rounded-xl p-4 space-y-2">
+                                    <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-4 space-y-2 border border-gray-200 dark:border-white/10">
                                         <div className="flex items-start justify-between">
                                             <BookOpen className="w-5 h-5 text-violet-400" />
                                             <div className="flex gap-2">
@@ -774,14 +879,14 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                 </motion.button>
                                             </div>
                                         </div>
-                                        <p className="text-sm text-gray-300 leading-relaxed">{notes[game.id]}</p>
+                                        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{notes[game.id]}</p>
                                     </div>
                                 ) : (
                                     <motion.button
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => startEditNote(game.id)}
-                                        className="w-full px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2"
+                                        className="w-full px-4 py-3 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 text-gray-900 dark:text-white"
                                     >
                                         <Plus className="w-4 h-4" />
                                         Add Personal Note
@@ -812,9 +917,9 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
         animate={{ opacity: 1 }}
         className="text-center -mt-30 pb-64 flex flex-col items-center justify-center"
     >
-        <Gamepad2 className="w-20 h-20 text-gray-700 mx-auto mb-6" />
-        <p className="text-2xl text-gray-400">No games found</p>
-        <p className="text-gray-500 mt-2">Try adjusting your filters or search terms</p>
+        <Gamepad2 className="w-20 h-20 text-gray-400 dark:text-gray-700 mx-auto mb-6" />
+<p className="text-2xl text-gray-700 dark:text-gray-400">No games found</p>
+<p className="text-gray-500 dark:text-gray-500 mt-2">Try adjusting your filters or search terms</p>
     </motion.div>
 )}
                     </div>
@@ -827,7 +932,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl"
+                            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 dark:bg-black/90 backdrop-blur-xl"
                             onClick={() => setSelectedGame(null)}
                         >
                             <motion.div
@@ -835,7 +940,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                 animate={{ scale: 1, y: 0 }}
                                 exit={{ scale: 0.9, y: 50 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-2xl rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-white/10 shadow-2xl"
+                                className="bg-white dark:bg-gradient-to-br dark:from-gray-900/95 dark:to-black/95 backdrop-blur-2xl rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-white/10 shadow-2xl"
                             >
                                 {/* Modal Header Image */}
                                 <div className="relative h-80 md:h-96 overflow-hidden">
@@ -851,7 +956,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         whileHover={{ scale: 1.1, rotate: 90 }}
                                         whileTap={{ scale: 0.9 }}
                                         onClick={() => setSelectedGame(null)}
-                                        className="absolute top-6 right-6 p-3 bg-black/50 backdrop-blur-sm rounded-full hover:bg-black/70 transition-all border border-white/20"
+                                        className="absolute top-6 right-6 p-3 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-black/70 transition-all border border-gray-200 dark:border-white/20"
                                     >
                                         <X className="w-6 h-6" />
                                     </motion.button>
@@ -864,7 +969,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                             className="flex items-end justify-between"
                                         >
                                             <div>
-                                                <h2 className="text-4xl md:text-5xl font-bold mb-3">{selectedGame.title}</h2>
+                                            <h2 className="text-4xl md:text-5xl font-bold mb-3 text-white">{selectedGame.title}</h2>
                                                 <div className="flex gap-3">
                                                     <span className="px-4 py-2 bg-purple-500/80 backdrop-blur-sm rounded-full text-sm font-bold">
                                                         {selectedGame.genre}
@@ -895,7 +1000,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.1 }}
-                                        className="text-xl text-gray-300 leading-relaxed"
+                                        className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed"
                                     >
                                         {selectedGame.short_description}
                                     </motion.p>
@@ -907,21 +1012,21 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         transition={{ delay: 0.2 }}
                                         className="grid grid-cols-1 md:grid-cols-2 gap-4"
                                     >
-                                        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                                        <div className="bg-gray-50 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-white/10">
                                             <p className="text-gray-500 text-sm mb-2 uppercase tracking-wider">Publisher</p>
-                                            <p className="text-xl font-semibold">{selectedGame.publisher}</p>
+                                            <p className="text-xl font-semibold text-gray-900 dark:text-white">{selectedGame.publisher}</p>
                                         </div>
-                                        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                                        <div className="bg-gray-50 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-white/10">
                                             <p className="text-gray-500 text-sm mb-2 uppercase tracking-wider">Developer</p>
-                                            <p className="text-xl font-semibold">{selectedGame.developer}</p>
+                                            <p className="text-xl font-semibold text-gray-900 dark:text-white">{selectedGame.developer}</p>
                                         </div>
-                                        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                                        <div className="bg-gray-50 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-white/10">
                                             <p className="text-gray-500 text-sm mb-2 uppercase tracking-wider">Release Date</p>
-                                            <p className="text-xl font-semibold">{selectedGame.release_date}</p>
+                                            <p className="text-xl font-semibold text-gray-900 dark:text-white">{selectedGame.release_date}</p>
                                         </div>
-                                        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                                        <div className="bg-gray-50 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-white/10">
                                             <p className="text-gray-500 text-sm mb-2 uppercase tracking-wider">Platform</p>
-                                            <p className="text-xl font-semibold">{selectedGame.platform}</p>
+                                            <p className="text-xl font-semibold text-gray-900 dark:text-white">{selectedGame.platform}</p>
                                         </div>
                                     </motion.div>
 
@@ -935,7 +1040,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         href={selectedGame.game_url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="block w-full px-10 py-6 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-2xl font-bold text-xl text-center transition-all shadow-2xl shadow-pink-500/30"
+                                        className="block w-full px-10 py-6 bg-gradient-to-r from-green-500 to-green-500 hover:from-green-600 hover:to-green-600 rounded-2xl font-bold text-xl text-center transition-all shadow-2xl shadow-green-500/30"
                                     >
                                         Play Now →
                                     </motion.a>
@@ -946,7 +1051,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                 </AnimatePresence>
 
                 {/* Footer */}
-                <footer className="relative py-12 border-t border-white/5 w-full">
+                <footer className="relative py-12 border-t border-gray-200 dark:border-white/5 w-full">
     <div className="container mx-auto px-4 lg:px-8 max-w-7xl w-full">
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -960,10 +1065,10 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                     GameVoyage
                                 </span>
                             </div>
-                            <p className="text-gray-500 text-sm">
+                            <p className="text-gray-600 dark:text-gray-500 text-sm">
                                 Your journey through the gaming universe
                             </p>
-                            <p className="text-gray-600 text-xs mt-4">
+                            <p className="text-gray-500 dark:text-gray-600 text-xs mt-4">
                                 © 2025 GameVoyage. All rights reserved.
                             </p>
                         </motion.div>

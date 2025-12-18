@@ -39,7 +39,7 @@ export default function GameVoyageIntro({ onComplete }) {
     };
   }, []); // Empty dependency array - only run once on mount
 
-  const letters = ['G', 'a', 'm', 'e', 'V', 'o', 'y', 'a', 'g', 'e'];
+  const letters = ['GameVoyage'];
 
   const letterVariants = {
     initial: { y: -100, opacity: 0 },
@@ -49,7 +49,7 @@ export default function GameVoyageIntro({ onComplete }) {
       transition: {
         delay: i * 0.1,
         type: "spring",
-        damping: 12,
+        damping: 20,
         stiffness: 200,
       }
     }),
@@ -123,7 +123,7 @@ export default function GameVoyageIntro({ onComplete }) {
               initial={{
                 x: Math.random() * window.innerWidth,
                 y: Math.random() * window.innerHeight,
-                opacity: 0.2
+                opacity: 0.6
               }}
               animate={{
                 y: [null, Math.random() * window.innerHeight],
@@ -167,7 +167,7 @@ export default function GameVoyageIntro({ onComplete }) {
                 className="relative"
               >
                 <motion.span
-                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent"
+                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-green-500 via-violet-500 to-violet-500 bg-clip-text text-transparent"
                   style={{
                     textShadow: '0 0 30px rgba(236,72,153,0.5)',
                     filter: 'drop-shadow(0 0 10px rgba(236,72,153,0.3))'
