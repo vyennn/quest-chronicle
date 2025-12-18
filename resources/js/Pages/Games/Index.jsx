@@ -184,7 +184,8 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
         <>
             <Head title="GameVoyage" />
 
-            <div ref={containerRef} className="min-h-screen bg-white text-white overflow-x-hidden">
+            <div className="min-h-screen bg-[#fffff] text-white overflow-x-hidden">
+
                 {/* Cursor Follower */}
                 <motion.div
                     className="fixed w-6 h-6 border-2 border-violet-500 rounded-full pointer-events-none z-50 mix-blend-difference hidden lg:block"
@@ -233,30 +234,33 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                                 >
-                                    <Gamepad2 className="w-8 h-8 text-violet-500" />
+                                
+
+
+
                                 </motion.div>
-                                <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 via-green-400 to-green-400 bg-clip-text text-transparent">
+                                <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-500 via-green-500 to-green-500 bg-clip-text text-transparent">
                                     GameVoyage
                                 </h1>
                             </motion.div>
 
                             {/* Desktop Menu - Floating Pill */}
-                            <nav className="hidden lg:flex items-center gap-3 absolute left-1/2 transform -translate-x-1/2 bg-white/30 backdrop-blur-md px-6 py-3 rounded-full border border-white/10">
+                            <nav className="hidden lg:flex gap-3 absolute left-[70%] transform -translate-x-1/2 bg-white backdrop-blur-md px-6 py-3 rounded-full border border-white/10">
                                 <button
                                     onClick={() => {
                                         setShowFavorites(false);
                                         document.getElementById('games-section').scrollIntoView({ behavior: 'smooth' });
                                     }}
-                                    className="px-4 py-2 text-l text-violet-500 hover:text-white hover:bg-white/10 rounded-full transition-all"
+                                    className="font-bold px-4 py-2 text-l text-violet-400 hover:text-white hover:bg-white/10 rounded-full transition-all"
                                 >
                                     Explore
                                 </button>
                                 <button
                                     onClick={() => setShowFavorites(!showFavorites)}
-                                    className={`px-4 py-2 text-l transition-all flex items-center gap-2 rounded-full ${
+                                    className={`px-4 py-2 text-l transition-all flex gap-2 rounded-full ${
                                         showFavorites 
                                             ? 'text-pink-400 bg-pink-500/20' 
-                                            : 'text-violet-500 hover:text-white hover:bg-white/10'
+                                            : 'font-bold text-violet-400 hover:text-white hover:bg-white/10'
                                     }`}
                                 >
                                     <Heart className={`w-4 h-4 ${showFavorites ? 'fill-pink-400 text-pink-400' : ''}`} />
@@ -298,7 +302,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         </AnimatePresence>
                                     </div>
                                 ) : (
-                                    <div className="flex gap-2 bg-white/30 backdrop-blur-md px-2 py-2 rounded-full border border-white/10">
+                                    <div className="flex gap-2 bg-violet-100 backdrop-blur-md px-0 py-0 rounded-full border border-white/10">
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
@@ -306,7 +310,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                 setAuthMode('login');
                                                 setShowAuthModal(true);
                                             }}
-                                            className="px-4 py-2 text-l text-violet-500 hover:bg-white/10 rounded-full transition-all"
+                                            className=" font-bold px-4 py-2 text-l text-violet-500 hover:bg-white/10 rounded-full transition-all"
                                         >
                                             Login
                                         </motion.button>
@@ -317,7 +321,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                 setAuthMode('register');
                                                 setShowAuthModal(true);
                                             }}
-                                            className="px-4 py-2 text-sm bg-gradient-to-r from-violet-500 to-violet-500 hover:from-green-300 hover:to-green-400 rounded-full transition-all"
+                                            className="font-bold px-4 py-2 text-sm bg-gradient-to-r from-violet-500 to-violet-500 hover:from-violet-400 hover:to-violet-400 rounded-full transition-all"
                                         >
                                             Sign Up
                                         </motion.button>
@@ -346,36 +350,31 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                 </span>
                             </motion.div>
 
-                            <motion.h1
-                                className="text-5xl md:text-7xl lg:text-7xl font-bold leading-none"
-                            >
-                                <motion.span 
-                                    initial={{ x: -100, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    transition={{ 
-                                        type: "spring", 
-                                        damping: 20, 
-                                        stiffness: 100,
-                                        delay: 0.3 
-                                    }}
-                                    className="block bg-gradient-to-r from-gray-400 via-gray-400 to-gray-400 bg-clip-text text-transparent"
-                                >
-                                    Embark on 
-                                </motion.span>
-                                <motion.span 
-                                    initial={{ x: 100, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    transition={{ 
-                                        type: "spring", 
-                                        damping: 20, 
-                                        stiffness: 100, 
-                                        delay: 0.5 
-                                    }}
-                                    className="text-sblock bg-gradient-to-r from-violet-400 via-green-400 to-green-400 bg-clip-text text-transparent"
-                                >
-                                    GameVoyage
-                                </motion.span>
-                            </motion.h1>
+                            <motion.h1 className="text-5xl md:text-7xl lg:text-7xl font-bold leading-none">
+  {/* Left-to-right span */}
+  <motion.span
+    initial={{ x: -100, opacity: 0 }}
+    whileInView={{ x: 0, opacity: 1 }}
+    viewport={{ once: false, amount: 0.5 }}
+    transition={{ type: "spring", damping: 15, stiffness: 120, delay: 0.2 }}
+    className="inline-block bg-gradient-to-r from-violet-400 via-green-400 to-green-400 bg-clip-text text-transparent"
+  >
+    Embark on
+  </motion.span>
+
+  {/* Right-to-left span */}
+  <motion.span
+    initial={{ x: 100, opacity: 0 }}
+    whileInView={{ x: 0, opacity: 1 }}
+    viewport={{ once: false, amount: 0.5 }}
+    transition={{ type: "spring", damping: 15, stiffness: 120, delay: 0.2 }}
+    className="inline-block bg-gradient-to-r from-violet-500 via-green-500 to-green-500 bg-clip-text text-transparent pb-1"
+  >
+    GameVoyage
+  </motion.span>
+</motion.h1>
+
+
 
                             <motion.p
                                 initial={{ opacity: 0 }}
@@ -438,7 +437,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                     delay: 1.5 
                                 }
                             }}
-                            className="w-full max-w-md lg:w-[900px] h-[400px] lg:h-[500px]"
+                            className="w-full max-w-md lg:w-[1000px] h-[800px] lg:h-[800px]"
                         >
                             <model-viewer
                                 src="Model/arcade-machine.glb"
@@ -458,13 +457,15 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                     '--poster-color': 'transparent'
                                 }}
                             />
+
+                            
                         </motion.div>
 
                     </div>
 
                     {/* Scroll Indicator */}
                     <motion.div
-                        initial={{ opacity: 0 }}
+                        initial={{ opacity: 0 }}    
                         animate={{ opacity: 1, y: [0, 10, 0] }}
                         transition={{ 
                             opacity: { delay: 1.2, duration: 0.5 }, 
@@ -554,13 +555,13 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                         >
                             <div className="flex flex-col lg:flex-row gap-4">
                                 <div className="relative flex-1">
-                                    <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                                    <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-violet-500 w-5 h-5" />
                                     <input
                                         type="text"
                                         placeholder="Search your next adventure..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-14 pr-6 py-5 bg-white/5 backdrop-blur-xl border border-gray/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all text-lg"
+                                        className="w-full pl-14 pr-6 py-5 bg-white/5 backdrop-blur-xl border border-violet-400 rounded-2xl text-white placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all text-lg"
                                     />
                                 </div>
                                 <motion.button
@@ -569,13 +570,13 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                     onClick={() => setShowFavorites(!showFavorites)}
                                     className={`px-8 py-5 rounded-2xl font-medium transition-all flex items-center justify-center gap-3 text-lg ${
                                         showFavorites
-                                            ? 'bg-gradient-to-r from-pink-500 to-purple-500'
-                                            : 'bg-white/5 hover:bg-white/10 border border-gray/500/40'
+                                            ? 'bg-gradient-to-r from-violet-500 to-violet-500'
+                                            : 'bg-violet-500 hover:bg-violet-500 border border-violet-500'
                                     }`}
                                 >
                                     <Heart className={`w-6 h-6 ${showFavorites ? 'fill-current' : ''}`} />
                                     <span className="hidden sm:inline">Collection</span>
-                                    <span className="bg-wgray/20 px-2 py-1 rounded-full text-sm">{favorites.length}</span>
+                                    <span className="bg-violet-400 px-2 py-1 rounded-full text-sm">{favorites.length}</span>
                                 </motion.button>
                             </div>
 
@@ -592,8 +593,8 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                         onClick={() => setFilterGenre(genre)}
                                         className={`px-6 py-3 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                                             filterGenre === genre
-                                                ? 'bg-gradient-to-r from-pink-500 to-purple-500 shadow-lg shadow-pink-500/30'
-                                                : 'bg-white/5 hover:bg-white/10 border border-white/10'
+                                                ? 'bg-gradient-to-r from-violet-500 to-green-500 shadow-lg shadow-violet-500/30'
+                                                : 'bg-violet-400 hover:bg-violet-400 border border-white/10'
                                         }`}
                                     >
                                         {genre === 'all' ? 'All Genres' : genre}
@@ -615,7 +616,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                             exit={{ opacity: 0, scale: 0.9 }}
                                             transition={{ delay: index * 0.05 }}
                                             whileHover={{ y: -10 }}
-                                            className="group relative bg-white/5 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/10 hover:border-pink-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/20"
+                                            className="group relative bg-violet-100 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/10 hover:border-pink-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/20"
                                         >
                                             {/* Game Image */}
                                             <div className="relative h-56 overflow-hidden">
@@ -649,7 +650,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
 
                                             {/* Game Info */}
                                             <div className="p-6 space-y-4">
-                                                <h3 className="text-2xl font-bold line-clamp-1 group-hover:text-pink-400 transition-colors">
+                                                <h3 className="text-gray-500 text-2xl font-bold line-clamp-1 group-hover:text-violet-500 transition-colors">
                                                     {game.title}
                                                 </h3>
                                                 <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed">
@@ -677,7 +678,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                             value={noteText}
                                             onChange={(e) => setNoteText(e.target.value)}
                                             placeholder="Add your personal note..."
-                                            className="w-full p-4 bg-white/5 border border-white/20 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
+                                            className="w-full p-4 bg-white/5 border border-white/20 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
                                             rows="3"
                                             autoFocus
                                         />
@@ -686,7 +687,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                 whileHover={{ scale: 1.02 }}
                                                 whileTap={{ scale: 0.98 }}
                                                 onClick={() => saveNote(game.id)}
-                                                className="flex-1 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg text-sm font-medium"
+                                                className="flex-1 px-4 py-2 bg-gradient-to-r from-violet-500 to-violet-500 rounded-lg text-sm font-medium"
                                             >
                                                 Save
                                             </motion.button>
@@ -703,7 +704,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                 ) : notes[game.id] ? (
                                     <div className="bg-white/5 rounded-xl p-4 space-y-2">
                                         <div className="flex items-start justify-between">
-                                            <BookOpen className="w-5 h-5 text-pink-400" />
+                                            <BookOpen className="w-5 h-5 text-violet-400" />
                                             <div className="flex gap-2">
                                                 <motion.button
                                                     whileHover={{ scale: 1.1 }}
@@ -744,7 +745,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setSelectedGame(game)}
-                            className="w-full mt-4 px-6 py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl font-medium transition-all shadow-lg shadow-pink-500/30"
+                            className="w-full mt-4 px-6 py-4 bg-gradient-to-r from-violet-500 to-green-500 hover:from-violet-600 hover:to-green-600 rounded-xl font-medium transition-all shadow-lg shadow-violet-500/30"
                         >
                             Explore Details
                         </motion.button>
@@ -818,7 +819,7 @@ export default function Index({ games, userFavorites, userNotes, auth }) {
                                                     <span className="px-4 py-2 bg-purple-500/80 backdrop-blur-sm rounded-full text-sm font-bold">
                                                         {selectedGame.genre}
                                                     </span>
-                                                    <span className="px-4 py-2 bg-pink-500/80 backdrop-blur-sm rounded-full text-sm font-bold">
+                                                    <span className="px-4 py-2 bg-violet-500/80 backdrop-blur-sm rounded-full text-sm font-bold">
                                                         {selectedGame.platform}
                                                     </span>
                                                 </div>
